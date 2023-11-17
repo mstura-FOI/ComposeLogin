@@ -27,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,6 +44,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.scriptify.textexamplecompose.ui.theme.TextExampleComposeTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
 public var fonts = FontFamily(Font( R.font.bebasneue_regular))
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -79,6 +83,7 @@ public fun scaffold(){
 public fun Login(
     listOfUsers:List<User>
 ){
+    val scope = rememberCoroutineScope()
     var inputName by remember {
         mutableStateOf("")
     }
@@ -146,16 +151,19 @@ public fun Login(
                 contentAlignment = Alignment.TopCenter
             ) {
                Button(onClick = {
-                                for(user in listOfUsers){
-                                    if(user.name == inputName && user.password == inputPassword){
-                                        name = inputName
-                                        password = inputPassword
-                                        return@Button
-                                    }else{
-                                        name = "Krivi"
-                                        password = "Podaci"
-                                    }
-                                }
+                   scope.launch(Dispatchers.IO){
+                       for(user in listOfUsers){
+                           if(user.name == inputName && user.password == inputPassword){
+                               name = inputName
+                               password = inputPassword
+                               return@launch
+                           }else{
+                               name = "Krivi"
+                               password = "Podaci"
+                           }
+                       }
+                   }
+
                                 },
                    modifier = Modifier.fillMaxWidth(0.5f),
                    ) {
